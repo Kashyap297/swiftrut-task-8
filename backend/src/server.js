@@ -3,6 +3,7 @@ const path = require("path");
 const dbConnection = require("./config/db");
 const Config = require("./config");
 const cors = require("cors");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 const PORT = Config.PORT || 5000;
@@ -19,6 +20,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Updated
 dbConnection();
 
 // api routes
+app.use("/api/users", userRoutes);
 
 app.listen(PORT, (err) => {
   if (err) {
