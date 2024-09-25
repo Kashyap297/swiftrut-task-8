@@ -4,6 +4,7 @@ const dbConnection = require("./config/db");
 const Config = require("./config");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
+const expenseRoutes = require("./routes/expenseRoute");
 
 const app = express();
 const PORT = Config.PORT || 5000;
@@ -21,6 +22,7 @@ dbConnection();
 
 // api routes
 app.use("/api/users", userRoutes);
+app.use("/api/expenses", expenseRoutes);
 
 app.listen(PORT, (err) => {
   if (err) {
