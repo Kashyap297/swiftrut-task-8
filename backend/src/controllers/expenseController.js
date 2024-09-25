@@ -37,7 +37,12 @@ const bulkAddExpenses = async (req, res) => {
   }
 
   const expenses = [];
-  const filePath = path.join(__dirname, `../uploads/${req.file.filename}`);
+  const filePath = req.file.path; // Use the path directly from multer
+
+  // Check if file exists before processing
+  if (!fs.existsSync(filePath)) {
+    return res.status(400).json({ message: "File not found" });
+  }
 
   fs.createReadStream(filePath)
     .pipe(csv())
@@ -59,6 +64,10 @@ const bulkAddExpenses = async (req, res) => {
       } catch (error) {
         res.status(400).json({ message: "Failed to bulk add expenses", error });
       }
+    })
+    .on("error", (error) => {
+      console.error("Error reading file:", error);
+      res.status(500).json({ message: "Error processing file", error });
     });
 };
 

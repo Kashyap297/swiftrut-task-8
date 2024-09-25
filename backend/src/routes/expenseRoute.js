@@ -7,9 +7,8 @@ const {
   deleteExpenses,
 } = require("../controllers/expenseController");
 const { protect } = require("../middlewares/authMiddleware");
-const multer = require("multer");
+const upload = require("../middlewares/multerConfig"); // Importing multer config
 
-const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 
 router.post("/", protect, addExpense);
