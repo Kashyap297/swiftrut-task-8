@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Set your backend API base URL
-const API_BASE_URL = "http://localhost:8000/api"; // Make sure to update this with your actual backend API URL
+const API_BASE_URL = "http://localhost:8000/api"; // Update with your backend API URL
 
 // Function to get the token from localStorage
 const getToken = () => localStorage.getItem("token");
@@ -28,10 +28,25 @@ export const addExpense = async (expense) => {
   return response.data;
 };
 
+// Update an expense
+export const updateExpense = async (id, updatedExpense) => {
+  const token = getToken();
+  const response = await axios.patch(
+    `${API_BASE_URL}/expenses/${id}`,
+    updatedExpense,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`, // Set token in headers
+      },
+    }
+  );
+  return response.data;
+};
+
 // Login user and receive the token
 export const loginUser = async (credentials) => {
   const response = await axios.post(`${API_BASE_URL}/users/login`, credentials);
-  return response.data; // This will include the token
+  return response.data;
 };
 
 // Register user and receive the token
@@ -40,5 +55,5 @@ export const registerUser = async (credentials) => {
     `${API_BASE_URL}/users/register`,
     credentials
   );
-  return response.data; // This will include the token
+  return response.data;
 };
