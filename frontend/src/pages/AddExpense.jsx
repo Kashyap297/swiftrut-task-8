@@ -56,88 +56,102 @@ const AddExpense = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8">
-      <h1 className="text-2xl font-bold mb-4">Add Expense</h1>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="container mx-auto mt-8 p-6 max-w-lg shadow-lg rounded-lg bg-white">
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">
+        Add Expense
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <p className="text-red-500 mb-4 p-2 rounded bg-red-100">{error}</p>
+        )}
 
-        <div className="mb-4">
-          <label className="block mb-2">Amount</label>
+        <div>
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            Amount
+          </label>
           <input
             type="number"
             name="amount"
             value={formData.amount}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="Amount"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter amount"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Description</label>
+        <div>
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            Description
+          </label>
           <input
             type="text"
             name="description"
             value={formData.description}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="Description"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter description"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Category</label>
+        <div>
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            Category
+          </label>
           <input
             type="text"
             name="category"
             value={formData.category}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="Category"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter category"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Payment Method</label>
+        <div>
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            Payment Method
+          </label>
           <select
             name="paymentMethod"
             value={formData.paymentMethod}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="cash">Cash</option>
             <option value="credit">Credit</option>
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Date</label>
+        <div>
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            Date
+          </label>
           <input
             type="date"
             name="date"
             value={formData.date}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="Date"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Upload CSV for Bulk Expenses</label>
+        <div>
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            Upload CSV for Bulk Expenses
+          </label>
           <input
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded-md w-full"
+          className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-md w-full hover:bg-blue-700 transition duration-300 ease-in-out"
         >
-          {csvFile ? "Upload CSV" : "Add Expense"}{" "}
-          {/* Change button text based on file upload */}
+          {csvFile ? "Upload CSV" : "Add Expense"}
         </button>
       </form>
     </div>

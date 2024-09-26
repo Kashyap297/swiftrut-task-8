@@ -1,25 +1,25 @@
 import React, { useContext, useEffect, useState } from "react";
-import { fetchExpenses, updateExpense, deleteExpenses } from "../api/api"; // Include the deleteExpenses API call
+import { fetchExpenses, updateExpense, deleteExpenses } from "../api/api";
 import { AuthContext } from "../context/AuthContext";
-import ReactPaginate from "react-paginate"; // Import ReactPaginate
+import ReactPaginate from "react-paginate";
 
 const MyExpenses = () => {
   const { user } = useContext(AuthContext);
   const [expenses, setExpenses] = useState([]);
-  const [editExpenseId, setEditExpenseId] = useState(null); // Track the currently editing expense
-  const [editedData, setEditedData] = useState({}); // Store the edited data
-  const [selectedExpenses, setSelectedExpenses] = useState([]); // Track selected expenses for bulk deletion
-  const [searchQuery, setSearchQuery] = useState(""); // For search
+  const [editExpenseId, setEditExpenseId] = useState(null);
+  const [editedData, setEditedData] = useState({});
+  const [selectedExpenses, setSelectedExpenses] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState({
     category: "",
     paymentMethod: "",
     startDate: "",
     endDate: "",
-  }); // For filters
+  });
 
-  const [page, setPage] = useState(0); // Start with page 0 for ReactPaginate
-  const [totalPages, setTotalPages] = useState(1); // Set total pages dynamically
-  const itemsPerPage = 10; // Set the number of items per page
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     getExpenses();
@@ -27,23 +27,21 @@ const MyExpenses = () => {
 
   const getExpenses = async () => {
     const response = await fetchExpenses({
-      page: page + 1, // API expects pages starting from 1
+      page: page + 1,
       limit: itemsPerPage,
     });
     if (response.expenses.length === 0 && page > 0) {
-      setPage(0); // Reset to the first page if no data is available on the current page
+      setPage(0);
     } else {
-      setExpenses(response.expenses); // Update the state with paginated expenses
-      setTotalPages(response.totalPages); // Set the total number of pages
+      setExpenses(response.expenses);
+      setTotalPages(response.totalPages);
     }
   };
 
-  // Handle page change for ReactPaginate
   const handlePageChange = ({ selected }) => {
-    setPage(selected); // Update the page state based on user selection
+    setPage(selected);
   };
 
-  // Handle manual Previous and Next page navigation
   const handlePreviousPage = () => {
     if (page > 0) {
       setPage(page - 1);
@@ -56,9 +54,8 @@ const MyExpenses = () => {
     }
   };
 
-  // Handle the Edit button click, toggle between view and edit mode
   const handleEditClick = (expense) => {
-    setEditExpenseId(expense._id); // Set the expense to edit mode
+    setEditExpenseId(expense._id);
     setEditedData({
       amount: expense.amount,
       description: expense.description,
@@ -68,19 +65,16 @@ const MyExpenses = () => {
     });
   };
 
-  // Handle saving the updated expense data
   const handleSaveClick = async (id) => {
     try {
       await updateExpense(id, editedData);
-      // After saving, reload the expenses
-      getExpenses(); // Re-fetch data after update
-      setEditExpenseId(null); // Exit edit mode
+      getExpenses();
+      setEditExpenseId(null);
     } catch (error) {
       console.error("Error updating expense", error);
     }
   };
 
-  // Handle input changes for editing
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedData({
@@ -89,20 +83,16 @@ const MyExpenses = () => {
     });
   };
 
-  // Handle checkbox change for selecting expenses
   const handleCheckboxChange = (expenseId) => {
     setSelectedExpenses((prevSelected) => {
       if (prevSelected.includes(expenseId)) {
-        // Remove the ID if it's already selected
         return prevSelected.filter((id) => id !== expenseId);
       } else {
-        // Add the ID to the selected list
         return [...prevSelected, expenseId];
       }
     });
   };
 
-  // Handle bulk delete
   const handleBulkDelete = async () => {
     if (selectedExpenses.length === 0) {
       alert("Please select at least one expense to delete.");
@@ -110,25 +100,23 @@ const MyExpenses = () => {
     }
 
     try {
-      await deleteExpenses(selectedExpenses); // Call API to delete selected expenses
-      setSelectedExpenses([]); // Clear the selected expenses list after deletion
-      getExpenses(); // Re-fetch data after delete
+      await deleteExpenses(selectedExpenses);
+      setSelectedExpenses([]);
+      getExpenses();
     } catch (error) {
       console.error("Error deleting expenses:", error);
     }
   };
 
-  // Handle single delete
   const handleSingleDelete = async (expenseId) => {
     try {
-      await deleteExpenses([expenseId]); // Call API to delete a single expense
-      getExpenses(); // Re-fetch data after delete
+      await deleteExpenses([expenseId]);
+      getExpenses();
     } catch (error) {
       console.error("Error deleting expense", error);
     }
   };
 
-  // Filter expenses based on search and filter criteria
   const filteredExpenses = expenses.filter((expense) => {
     const startDateMatch =
       !filter.startDate || new Date(expense.date) >= new Date(filter.startDate);
@@ -155,7 +143,6 @@ const MyExpenses = () => {
     );
   });
 
-  // Handle input changes for filters and search
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter({
@@ -165,74 +152,83 @@ const MyExpenses = () => {
   };
 
   return (
-    <div>
-      <h1>My Expenses</h1>
+    <div className="container mx-auto p-6">
+      <h1 className="text-4xl font-bold mb-6 text-center text-blue-700">
+        My Expenses
+      </h1>
 
-      {/* Search bar */}
-      <div>
+      {/* Search and Filters */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <input
           type="text"
           placeholder="Search by description"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          className="border-2 border-gray-300 p-2 rounded-md w-full"
         />
-      </div>
 
-      {/* Filters */}
-      <div>
         <input
           type="text"
           name="category"
           placeholder="Filter by Category"
           value={filter.category}
           onChange={handleFilterChange}
+          className="border-2 border-gray-300 p-2 rounded-md w-full"
         />
+
         <input
           type="text"
           name="paymentMethod"
           placeholder="Filter by Payment Method"
           value={filter.paymentMethod}
           onChange={handleFilterChange}
+          className="border-2 border-gray-300 p-2 rounded-md w-full"
         />
+
         <input
           type="date"
           name="startDate"
-          placeholder="Start Date"
           value={filter.startDate}
           onChange={handleFilterChange}
+          className="border-2 border-gray-300 p-2 rounded-md w-full"
         />
+
         <input
           type="date"
           name="endDate"
-          placeholder="End Date"
           value={filter.endDate}
           onChange={handleFilterChange}
+          className="border-2 border-gray-300 p-2 rounded-md w-full"
         />
       </div>
 
-      <table className="min-w-full bg-white border">
+      {/* Expenses Table */}
+      <table className="table-auto w-full bg-white shadow-lg rounded-lg">
         <thead>
-          <tr>
-            <th>Select</th>
-            <th>Description</th>
-            <th>Amount</th>
-            <th>Category</th>
-            <th>Date</th>
-            <th>Payment Method</th>
-            <th>Actions</th>
+          <tr className="bg-blue-600 text-white text-left">
+            <th className="px-4 py-2">Select</th>
+            <th className="px-4 py-2">Description</th>
+            <th className="px-4 py-2">Amount</th>
+            <th className="px-4 py-2">Category</th>
+            <th className="px-4 py-2">Date</th>
+            <th className="px-4 py-2">Payment Method</th>
+            <th className="px-4 py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredExpenses.map((expense) => (
-            <tr key={expense._id} className="border-t">
-              <td>
+            <tr
+              key={expense._id}
+              className="border-b hover:bg-gray-50 transition duration-300 ease-in-out"
+            >
+              <td className="px-4 py-2">
                 <input
                   type="checkbox"
                   checked={selectedExpenses.includes(expense._id)}
                   onChange={() => handleCheckboxChange(expense._id)}
                 />
               </td>
-              <td>
+              <td className="px-4 py-2">
                 {editExpenseId === expense._id ? (
                   <input
                     type="text"
@@ -240,12 +236,13 @@ const MyExpenses = () => {
                     value={editedData.description}
                     onChange={handleInputChange}
                     placeholder="Description"
+                    className="border p-2 rounded-md"
                   />
                 ) : (
                   expense.description
                 )}
               </td>
-              <td>
+              <td className="px-4 py-2">
                 {editExpenseId === expense._id ? (
                   <input
                     type="number"
@@ -253,12 +250,13 @@ const MyExpenses = () => {
                     value={editedData.amount}
                     onChange={handleInputChange}
                     placeholder="Amount"
+                    className="border p-2 rounded-md"
                   />
                 ) : (
                   `$${expense.amount}`
                 )}
               </td>
-              <td>
+              <td className="px-4 py-2">
                 {editExpenseId === expense._id ? (
                   <input
                     type="text"
@@ -266,49 +264,27 @@ const MyExpenses = () => {
                     value={editedData.category}
                     onChange={handleInputChange}
                     placeholder="Category"
+                    className="border p-2 rounded-md"
                   />
                 ) : (
                   expense.category
                 )}
               </td>
-              <td>
-                {editExpenseId === expense._id ? (
-                  <input
-                    type="date"
-                    name="date"
-                    value={new Date(editedData.date)
-                      .toISOString()
-                      .substr(0, 10)}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  new Date(expense.date).toLocaleDateString()
-                )}
+              <td className="px-4 py-2">
+                {new Date(expense.date).toLocaleDateString()}
               </td>
-              <td>
-                {editExpenseId === expense._id ? (
-                  <input
-                    type="text"
-                    name="paymentMethod"
-                    value={editedData.paymentMethod}
-                    onChange={handleInputChange}
-                    placeholder="Payment Method"
-                  />
-                ) : (
-                  expense.paymentMethod
-                )}
-              </td>
-              <td>
+              <td className="px-4 py-2">{expense.paymentMethod}</td>
+              <td className="px-4 py-2 flex space-x-2">
                 {editExpenseId === expense._id ? (
                   <>
                     <button
-                      className="bg-green-500 text-white px-2 py-1 rounded"
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-4 rounded-md transition duration-300"
                       onClick={() => handleSaveClick(expense._id)}
                     >
                       Save
                     </button>
                     <button
-                      className="bg-gray-500 text-white px-2 py-1 rounded"
+                      className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-4 rounded-md transition duration-300"
                       onClick={() => setEditExpenseId(null)}
                     >
                       Cancel
@@ -317,13 +293,13 @@ const MyExpenses = () => {
                 ) : (
                   <>
                     <button
-                      className="bg-yellow-500 text-white px-2 py-1 rounded"
+                      className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-4 rounded-md transition duration-300"
                       onClick={() => handleEditClick(expense)}
                     >
                       Edit
                     </button>
                     <button
-                      className="bg-red-500 text-white px-2 py-1 rounded"
+                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded-md transition duration-300"
                       onClick={() => handleSingleDelete(expense._id)}
                     >
                       Delete
@@ -337,38 +313,45 @@ const MyExpenses = () => {
       </table>
 
       {/* Pagination Controls */}
-      <div className="pagination flex justify-center mt-4">
+      {/* Pagination Controls */}
+      <div className="pagination flex justify-center mt-6">
         <button
-          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 mx-2 rounded"
+          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 mx-2 rounded-md transition duration-300"
           onClick={handlePreviousPage}
-          disabled={page === 0} // Disable button on the first page
+          disabled={page === 0} // Disable previous button on first page
         >
           Previous Page
         </button>
+
         <ReactPaginate
-          previousLabel={"Previous"}
-          nextLabel={"Next"}
-          pageCount={totalPages}
+          previousLabel={null} // Disable built-in "Previous" label
+          nextLabel={null} // Disable built-in "Next" label
+          pageCount={totalPages} // Use calculated total pages
           onPageChange={handlePageChange}
-          containerClassName={"pagination flex justify-center"}
-          activeClassName={"bg-blue-500 text-white"}
+          forcePage={page} // Highlight the current page
+          containerClassName={"pagination flex justify-center space-x-2"}
+          activeClassName={"bg-blue-500 text-white px-4 py-2 rounded-md"}
         />
+
         <button
-          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 mx-2 rounded"
+          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 mx-2 rounded-md transition duration-300"
           onClick={handleNextPage}
-          disabled={page === totalPages - 1} // Disable button on the last page
+          disabled={page === totalPages - 1} // Disable next button on last page
         >
           Next Page
         </button>
       </div>
 
-      <button
-        className="bg-red-600 text-white px-4 py-2 rounded mt-4"
-        onClick={handleBulkDelete}
-        disabled={selectedExpenses.length === 0}
-      >
-        Delete Selected
-      </button>
+      {/* Bulk Delete Button */}
+      <div className="flex justify-center mt-6">
+        <button
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md font-bold transition duration-300"
+          onClick={handleBulkDelete}
+          disabled={selectedExpenses.length === 0}
+        >
+          Delete Selected
+        </button>
+      </div>
     </div>
   );
 };
