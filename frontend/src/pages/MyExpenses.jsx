@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { fetchExpenses, updateExpense, deleteExpenses } from "../api/api"; // Include the deleteExpenses API call
 import { AuthContext } from "../context/AuthContext";
+import ReactPaginate from "react-paginate"; // Import ReactPaginate
 
 const MyExpenses = () => {
   const { user } = useContext(AuthContext);
@@ -16,13 +17,44 @@ const MyExpenses = () => {
     endDate: "",
   }); // For filters
 
+  const [page, setPage] = useState(0); // Start with page 0 for ReactPaginate
+  const [totalPages, setTotalPages] = useState(1); // Set total pages dynamically
+  const itemsPerPage = 10; // Set the number of items per page
+
   useEffect(() => {
-    const getExpenses = async () => {
-      const data = await fetchExpenses();
-      setExpenses(data.expenses);
-    };
     getExpenses();
-  }, []);
+  }, [page]);
+
+  const getExpenses = async () => {
+    const response = await fetchExpenses({
+      page: page + 1, // API expects pages starting from 1
+      limit: itemsPerPage,
+    });
+    if (response.expenses.length === 0 && page > 0) {
+      setPage(0); // Reset to the first page if no data is available on the current page
+    } else {
+      setExpenses(response.expenses); // Update the state with paginated expenses
+      setTotalPages(response.totalPages); // Set the total number of pages
+    }
+  };
+
+  // Handle page change for ReactPaginate
+  const handlePageChange = ({ selected }) => {
+    setPage(selected); // Update the page state based on user selection
+  };
+
+  // Handle manual Previous and Next page navigation
+  const handlePreviousPage = () => {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (page < totalPages - 1) {
+      setPage(page + 1);
+    }
+  };
 
   // Handle the Edit button click, toggle between view and edit mode
   const handleEditClick = (expense) => {
@@ -41,8 +73,7 @@ const MyExpenses = () => {
     try {
       await updateExpense(id, editedData);
       // After saving, reload the expenses
-      const data = await fetchExpenses();
-      setExpenses(data.expenses);
+      getExpenses(); // Re-fetch data after update
       setEditExpenseId(null); // Exit edit mode
     } catch (error) {
       console.error("Error updating expense", error);
@@ -80,12 +111,8 @@ const MyExpenses = () => {
 
     try {
       await deleteExpenses(selectedExpenses); // Call API to delete selected expenses
-      setExpenses((prevExpenses) =>
-        prevExpenses.filter(
-          (expense) => !selectedExpenses.includes(expense._id)
-        )
-      );
       setSelectedExpenses([]); // Clear the selected expenses list after deletion
+      getExpenses(); // Re-fetch data after delete
     } catch (error) {
       console.error("Error deleting expenses:", error);
     }
@@ -95,9 +122,7 @@ const MyExpenses = () => {
   const handleSingleDelete = async (expenseId) => {
     try {
       await deleteExpenses([expenseId]); // Call API to delete a single expense
-      setExpenses((prevExpenses) =>
-        prevExpenses.filter((expense) => expense._id !== expenseId)
-      );
+      getExpenses(); // Re-fetch data after delete
     } catch (error) {
       console.error("Error deleting expense", error);
     }
@@ -310,6 +335,32 @@ const MyExpenses = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="pagination flex justify-center mt-4">
+        <button
+          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 mx-2 rounded"
+          onClick={handlePreviousPage}
+          disabled={page === 0} // Disable button on the first page
+        >
+          Previous Page
+        </button>
+        <ReactPaginate
+          previousLabel={"Previous"}
+          nextLabel={"Next"}
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          containerClassName={"pagination flex justify-center"}
+          activeClassName={"bg-blue-500 text-white"}
+        />
+        <button
+          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 mx-2 rounded"
+          onClick={handleNextPage}
+          disabled={page === totalPages - 1} // Disable button on the last page
+        >
+          Next Page
+        </button>
+      </div>
 
       <button
         className="bg-red-600 text-white px-4 py-2 rounded mt-4"
