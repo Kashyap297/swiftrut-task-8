@@ -8,6 +8,13 @@ const MyExpenses = () => {
   const [editExpenseId, setEditExpenseId] = useState(null); // Track the currently editing expense
   const [editedData, setEditedData] = useState({}); // Store the edited data
   const [selectedExpenses, setSelectedExpenses] = useState([]); // Track selected expenses for bulk deletion
+  const [searchQuery, setSearchQuery] = useState(""); // For search
+  const [filter, setFilter] = useState({
+    category: "",
+    paymentMethod: "",
+    startDate: "",
+    endDate: "",
+  }); // For filters
 
   useEffect(() => {
     const getExpenses = async () => {
@@ -96,9 +103,88 @@ const MyExpenses = () => {
     }
   };
 
+  // Filter expenses based on search and filter criteria
+  const filteredExpenses = expenses.filter((expense) => {
+    const startDateMatch =
+      !filter.startDate || new Date(expense.date) >= new Date(filter.startDate);
+    const endDateMatch =
+      !filter.endDate || new Date(expense.date) <= new Date(filter.endDate);
+    const categoryMatch =
+      !filter.category ||
+      expense.category.toLowerCase().includes(filter.category.toLowerCase());
+    const paymentMethodMatch =
+      !filter.paymentMethod ||
+      expense.paymentMethod
+        .toLowerCase()
+        .includes(filter.paymentMethod.toLowerCase());
+    const searchMatch =
+      !searchQuery ||
+      expense.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return (
+      startDateMatch &&
+      endDateMatch &&
+      categoryMatch &&
+      paymentMethodMatch &&
+      searchMatch
+    );
+  });
+
+  // Handle input changes for filters and search
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilter({
+      ...filter,
+      [name]: value,
+    });
+  };
+
   return (
     <div>
       <h1>My Expenses</h1>
+
+      {/* Search bar */}
+      <div>
+        <input
+          type="text"
+          placeholder="Search by description"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {/* Filters */}
+      <div>
+        <input
+          type="text"
+          name="category"
+          placeholder="Filter by Category"
+          value={filter.category}
+          onChange={handleFilterChange}
+        />
+        <input
+          type="text"
+          name="paymentMethod"
+          placeholder="Filter by Payment Method"
+          value={filter.paymentMethod}
+          onChange={handleFilterChange}
+        />
+        <input
+          type="date"
+          name="startDate"
+          placeholder="Start Date"
+          value={filter.startDate}
+          onChange={handleFilterChange}
+        />
+        <input
+          type="date"
+          name="endDate"
+          placeholder="End Date"
+          value={filter.endDate}
+          onChange={handleFilterChange}
+        />
+      </div>
+
       <table className="min-w-full bg-white border">
         <thead>
           <tr>
@@ -112,7 +198,7 @@ const MyExpenses = () => {
           </tr>
         </thead>
         <tbody>
-          {expenses.map((expense) => (
+          {filteredExpenses.map((expense) => (
             <tr key={expense._id} className="border-t">
               <td>
                 <input

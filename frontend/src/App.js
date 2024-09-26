@@ -4,7 +4,8 @@ import Header from "./components/Header";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyExpenses from "./pages/MyExpenses";
-import AddExpense from "./pages/AddExpense"; // Import the AddExpense page
+import AddExpense from "./pages/AddExpense";
+import ExpenseStatistics from "./pages/ExpenseStatistics"; // Import ExpenseStatistics page
 import ProtectedRoute from "./context/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -32,6 +33,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AddExpense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/statistics"
+            element={
+              <ProtectedRoute>
+                <ExpenseStatistics />
               </ProtectedRoute>
             }
           />
