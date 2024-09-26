@@ -1,8 +1,7 @@
 import axios from "axios";
 
 // Set your backend API base URL
-// const API_BASE_URL = "https://swiftrut-task-8.onrender.com/api"; // Update with your backend API URL
-const API_BASE_URL = "http://localhost:8000/api"; // Update with your backend API URL
+const API_BASE_URL = "https://swiftrut-task-8.onrender.com/api"; // Update with your backend API URL
 
 // Function to get the token from localStorage
 const getToken = () => localStorage.getItem("token");
