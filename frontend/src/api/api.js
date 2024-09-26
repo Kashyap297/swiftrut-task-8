@@ -54,6 +54,17 @@ export const updateExpense = async (id, updatedExpense) => {
   );
   return response.data;
 };
+// Function to delete one or more expenses
+export const deleteExpenses = async (ids) => {
+  const token = getToken();
+  const response = await axios.delete(`${API_BASE_URL}/expenses`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: { ids }, // Pass the array of IDs in the request body
+  });
+  return response.data;
+};
 
 // Login user and receive the token
 export const loginUser = async (credentials) => {
