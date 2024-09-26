@@ -26,15 +26,22 @@ const MyExpenses = () => {
   }, [page]);
 
   const getExpenses = async () => {
-    const response = await fetchExpenses({
-      page: page + 1,
-      limit: itemsPerPage,
-    });
-    if (response.expenses.length === 0 && page > 0) {
-      setPage(0);
-    } else {
-      setExpenses(response.expenses);
-      setTotalPages(response.totalPages);
+    try {
+      const response = await fetchExpenses({
+        page: page + 1, // Adjust to match backend's 1-based page index
+        limit: itemsPerPage,
+      });
+
+      // Ensure the response contains `expenses` and `totalExpenses`
+      if (response.expenses.length === 0 && page > 0) {
+        setPage(0); // Reset to first page if no data on the current page
+      } else {
+        setExpenses(response.expenses);
+        const totalItems = response.totalExpenses || 0;
+        setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      }
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
     }
   };
 
@@ -312,7 +319,6 @@ const MyExpenses = () => {
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
       {/* Pagination Controls */}
       <div className="pagination flex justify-center mt-6">
         <button

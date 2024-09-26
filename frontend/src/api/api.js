@@ -1,17 +1,22 @@
 import axios from "axios";
 
 // Set your backend API base URL
-const API_BASE_URL = "https://swiftrut-task-8.onrender.com/api"; // Update with your backend API URL
+// const API_BASE_URL = "https://swiftrut-task-8.onrender.com/api"; // Update with your backend API URL
+const API_BASE_URL = "http://localhost:8000/api"; // Update with your backend API URL
 
 // Function to get the token from localStorage
 const getToken = () => localStorage.getItem("token");
 
-// Fetch expenses with token authentication
-export const fetchExpenses = async () => {
+// Fetch expenses with pagination
+export const fetchExpenses = async ({ page, limit }) => {
   const token = getToken();
   const response = await axios.get(`${API_BASE_URL}/expenses`, {
     headers: {
-      Authorization: `Bearer ${token}`, // Set token in headers
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      page,
+      limit,
     },
   });
   return response.data;

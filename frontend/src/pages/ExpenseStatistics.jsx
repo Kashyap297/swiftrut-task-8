@@ -20,6 +20,8 @@ const ExpenseStatistics = () => {
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState("all");
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [error, setError] = useState(null); // Add error state
 
   // Function to get all months in the year
   const getAllMonths = () => [
@@ -39,9 +41,16 @@ const ExpenseStatistics = () => {
 
   useEffect(() => {
     const getExpenses = async () => {
-      const data = await fetchExpenses();
-      setExpenses(data.expenses);
-      setFilteredExpenses(data.expenses); // Set initial filtered expenses
+      try {
+        const data = await fetchExpenses({ page: 1, limit: 10 });
+        setExpenses(data.expenses || []); // Ensure that expenses is an array
+        setFilteredExpenses(data.expenses || []); // Set initial filtered expenses
+        setLoading(false); // Data is fetched, stop loading
+      } catch (err) {
+        console.error("Error fetching expenses:", err);
+        setError("Failed to fetch expenses.");
+        setLoading(false); // Stop loading in case of error
+      }
     };
     getExpenses();
   }, []);
@@ -67,7 +76,7 @@ const ExpenseStatistics = () => {
 
   useEffect(() => {
     filterExpenses();
-  }, [selectedCategory, selectedMonth]);
+  }, [selectedCategory, selectedMonth, expenses]);
 
   const expenseByCategory = filteredExpenses.reduce((acc, expense) => {
     acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
@@ -105,6 +114,15 @@ const ExpenseStatistics = () => {
     "#A569BD",
     "#F39C12",
   ];
+
+  // Handle loading and error states
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="container mx-auto mt-8">
@@ -159,29 +177,35 @@ const ExpenseStatistics = () => {
           Expenses by Category
         </h2>
         <div className="w-full h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={categoryData}
-                dataKey="value"
-                nameKey="name"
-                label
-                labelLine={false}
-                outerRadius={120}
-                cx="50%"
-                cy="50%"
-                animationDuration={800} // Adding smooth animation
-              >
-                {categoryData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          {categoryData.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  dataKey="value"
+                  nameKey="name"
+                  label
+                  labelLine={false}
+                  outerRadius={120}
+                  cx="50%"
+                  cy="50%"
+                  animationDuration={800} // Adding smooth animation
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-center text-gray-500">
+              No expenses available for the selected category.
+            </div>
+          )}
         </div>
       </div>
 
@@ -191,26 +215,32 @@ const ExpenseStatistics = () => {
           Expenses Over Time (Monthly)
         </h2>
         <div className="w-full h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="name" stroke="#334155">
-                <Label value="Month" offset={-10} position="insideBottom" />
-              </XAxis>
-              <YAxis stroke="#334155">
-                <Label value="Total ($)" angle={-90} position="insideLeft" />
-              </YAxis>
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#6366f1"
-                activeDot={{ r: 8 }}
-                animationDuration={800} // Adding smooth animation
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {monthlyData.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#334155">
+                  <Label value="Month" offset={-10} position="insideBottom" />
+                </XAxis>
+                <YAxis stroke="#334155">
+                  <Label value="Total ($)" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#6366f1"
+                  activeDot={{ r: 8 }}
+                  animationDuration={800} // Adding smooth animation
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-center text-gray-500">
+              No expenses available for the selected month.
+            </div>
+          )}
         </div>
       </div>
     </div>
