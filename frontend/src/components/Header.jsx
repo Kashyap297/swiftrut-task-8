@@ -15,6 +15,9 @@ const Header = () => {
                 <Link to="/">My Expenses</Link>
               </li>
               <li>
+                <Link to="/add-expense">Add Expense</Link> {/* Add this link */}
+              </li>
+              <li>
                 <button onClick={logout}>Logout</button>
               </li>
             </>

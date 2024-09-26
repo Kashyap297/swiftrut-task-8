@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyExpenses from "./pages/MyExpenses";
+import AddExpense from "./pages/AddExpense"; // Import the AddExpense page
 import ProtectedRoute from "./context/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -23,6 +24,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyExpenses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-expense"
+            element={
+              <ProtectedRoute>
+                <AddExpense />
               </ProtectedRoute>
             }
           />

@@ -28,6 +28,18 @@ export const addExpense = async (expense) => {
   return response.data;
 };
 
+// Bulk add expenses via CSV
+export const bulkAddExpenses = async (formData) => {
+  const token = getToken();
+  const response = await axios.post(`${API_BASE_URL}/expenses/bulk`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`, // Set token in headers
+      "Content-Type": "multipart/form-data", // For file uploads
+    },
+  });
+  return response.data;
+};
+
 // Update an expense
 export const updateExpense = async (id, updatedExpense) => {
   const token = getToken();
