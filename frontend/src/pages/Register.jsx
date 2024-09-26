@@ -18,7 +18,7 @@ const Register = () => {
     try {
       const userData = await registerUser(formData); // Register user through API
       login(userData); // Update context with user data
-      navigate("/myexpenses"); // Redirect after registration
+      navigate("/"); // Redirect after registration
     } catch (err) {
       setError("Registration failed");
       console.error("Registration error:", err);
