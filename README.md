@@ -1,6 +1,3 @@
-
-Here’s a README file tailored for your Expense Tracker Application, following the style you provided:
-
 Expense Tracker Application
 A full-stack Expense Tracker application that allows users to add, view, manage, and analyze their expenses. The frontend is built using React, while the backend uses Node.js, Express, and MongoDB for handling data and user authentication. The application is fully deployed, offering a smooth and user-friendly experience for managing personal finances.
 
